@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Temp Files
+send.py
+ticket.index
+ticket.list
+ticket.msg
+invites.index
