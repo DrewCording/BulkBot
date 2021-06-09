@@ -33,17 +33,23 @@ async def cashout(ctx, user: discord.Member):
         if not commissions:
             await ctx.send("<@!" + str(user.id) + "> has no available commissions.")
         else:
+            total=0
+            for commission in commissions:
+                total=total+int(commission[2])
+
+
             mycursor.execute("DELETE FROM commissions WHERE id=" + str(user.id))
             mydb.commit()
-            await ctx.send("<@!" + str(user.id) + "> has been marked as cashed out for all available commissions.")
+            await ctx.send("<@!" + str(user.id) + "> has been marked as cashed out for all available commissions (" + total + ")")
     
     else:
         await ctx.send("You must use this command in a payout channel")
 
+    print(str(str(ctx.author) + " cashed out " + str(user) + " for " + str(total)))
 
-'''@cashout.error
+@cashout.error
 async def cashout_error(ctx, error):
     if isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
-        await ctx.send("Must provide @User to cashout")'''
+        await ctx.send("Must provide @User to cashout")
 
 client.run(os.getenv('TOKEN'))
