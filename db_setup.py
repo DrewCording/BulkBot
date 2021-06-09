@@ -15,10 +15,12 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 #mycursor.execute("CREATE DATABASE burnt_bot")
-#mycursor.execute("CREATE TABLE buyers (name VARCHAR(255), id VARCHAR(255), inviter VARCHAR(255), inviter_id VARCHAR(255))")
-#mycursor.execute("CREATE TABLE commissions (name VARCHAR(255), id VARCHAR(255), buyer VARCHAR(255), amount VARCHAR(255))")
+mycursor.execute("CREATE TABLE buyers (date VARCHAR(255), name VARCHAR(255), id VARCHAR(255), inviter VARCHAR(255), inviter_id VARCHAR(255))")
+mycursor.execute("CREATE TABLE commissions (date VARCHAR(255), name VARCHAR(255), id VARCHAR(255), buyer VARCHAR(255), amount VARCHAR(255))")
 
-mycursor.execute("SHOW TABLES")
+#mycursor.execute("SHOW TABLES")
 
-for x in mycursor:
-  print(x)
+#mycursor.execute("SELECT * FROM buyers WHERE id=852195369956671499")
+#myresult=mycursor.fetchall()
+
+print(myresult[0][2])

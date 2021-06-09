@@ -26,6 +26,7 @@ async def on_guild_join(guild):
     await message.add_reaction("📩")
 
     guilds_file = open("guilds_ext.list", "a")
+    guilds_file.write(str(str(guild.id) + "\n"))
     guilds_file.write(str(str(category.id) + "\n"))
     guilds_file.write(str(str(channel.id) + "\n"))
     guilds_file.write(str(str(message.id) + "\n"))

@@ -17,6 +17,9 @@ async def on_ready():
 
 @client.event
 async def on_raw_reaction_add(payload):
+    if payload.user_id == client.user.id:
+        return
+
     if payload.channel_id == int(os.getenv('ticket_chan')):
         if payload.message_id == int(os.getenv('ticket_msg')):
             channel = client.get_channel(payload.channel_id)

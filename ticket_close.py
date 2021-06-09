@@ -49,7 +49,7 @@ async def on_raw_reaction_add(payload):
                 msg_ptrn = "<@!(.*?)>"
                 user_id = re.search(msg_ptrn, message.content)
                 user = message.guild.get_member(int(user_id.group(1)))
-                await channel.set_permissions(user, read_messages=False, send_messages=False)
+                await channel.set_permissions(user, read_messages=True, send_messages=False)
 
 client.run(os.getenv('TOKEN'))
 

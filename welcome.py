@@ -6,6 +6,7 @@ from discord.ext import commands
 from datetime import datetime
 import re
 import mysql.connector
+from datetime import datetime
 
 load_dotenv()
 intents = discord.Intents.all()
@@ -62,8 +63,8 @@ async def on_member_join(member):
     channel = client.get_channel(int(os.getenv('welcome_chan')))
     await channel.send("Hey <@!" + str(member.id) + ">, welcome to " + member.guild.name + "\n\nTo place an order use <#" + os.getenv('order_chan') + ">.\nTo create a ticket use <#" + os.getenv('ticket_chan') + ">.\n\nI have detected that you were invited by <@!" + str(invite.inviter.id) + ">. If this seems incorrect, create a ticket to correct it.")
 
-    sql = "INSERT INTO buyers (name, id, inviter, inviter_id) VALUES (%s, %s, %s, %s)"
-    val = (str(member), str(member.id), str(invite.inviter), str(invite.inviter.id))
+    sql = "INSERT INTO buyers (date, name, id, inviter, inviter_id) VALUES (%s, %s, %s, %s, %s)"
+    val = (str(datetime.now()), str(member), str(member.id), str(invite.inviter), str(invite.inviter.id))
     mycursor.execute(sql, val)
     mydb.commit()
 

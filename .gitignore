@@ -130,7 +130,7 @@ dmypy.json
 
 # Temp Files
 send.py
-ticket.index
-ticket.list
-ticket.msg
-invites.index
+*.list
+*.msg
+*.index
+
