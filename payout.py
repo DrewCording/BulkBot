@@ -20,8 +20,6 @@ mydb = mysql.connector.connect(
     database="burnt_bot"
 )
 
-mycursor = mydb.cursor()
-
 @client.event
 async def on_ready():
     print('payout started on bot {0.user}'.format(client))
@@ -65,8 +63,10 @@ async def on_raw_reaction_add(payload):
                 await payout_message.add_reaction("🔒")
                 await payout_message.pin()
 
+                mycursor = mydb.cursor()
                 mycursor.execute(str("SELECT date, buyer, amount FROM commissions WHERE id=" + str(user.id)))
                 commissions = mycursor.fetchall()
+                mydb.commit()
 
                 title = ("Date", "Buyer", "Commission")
             

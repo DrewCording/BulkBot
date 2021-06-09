@@ -20,8 +20,6 @@ mydb = mysql.connector.connect(
     database="burnt_bot"
 )
 
-mycursor = mydb.cursor()
-
 @client.event
 async def on_ready():
     print('order close started on bot {0.user}'.format(client))
@@ -103,9 +101,10 @@ async def on_raw_reaction_add(payload):
                         mult = int(1000000000)
 
                     value = num * mult
-                    commission = int(value * 0.1)
-                    dev_fee = int(value * 0.05)
+                    commission = int(value * float(os.getenv('commission')))
+                    dev_fee = int(value * float(os.getenv('dev_fee')))
 
+                    mycursor = mydb.cursor()
                     mycursor.execute(str("SELECT * FROM buyers WHERE id=" + str(buyer.id)))
                     commissioner = mycursor.fetchall()
 
@@ -157,8 +156,61 @@ async def on_raw_reaction_add(payload):
 
                     msg_ptrn = "<@!(.*?)>"
                     user_id = re.search(msg_ptrn, ext_message.content)
-                    user = ext_message.guild.get_member(int(user_id.group(1)))
-                    await ext_channel.set_permissions(user, read_messages=True, send_messages=False)
+                    buyer = ext_message.guild.get_member(int(user_id.group(1)))
+                    await ext_channel.set_permissions(buyer, read_messages=True, send_messages=False)
+
+                    closer = message.guild.get_member(int(payload.user_id))
+                    mod_role = discord.utils.get(message.guild.roles, name=os.getenv('mod_role'))
+                    value_chan = await message.guild.create_text_channel(str(str(channel.name).replace("closed", "commission")))
+                    await value_chan.set_permissions(message.guild.default_role, read_messages=False, send_messages=False)
+                    await value_chan.set_permissions(closer, read_messages=True, send_messages=True)
+                    await value_chan.set_permissions(mod_role, read_messages=True, send_messages=True)
+                    await value_chan.send("Hey <@!" + str(closer.id) + ">, you just closed an order. Please tell me the total profit of that order so I can correctly calculate the commission.\nSimply respond '500' or '10365K' or '500M' or '2B' for example.\nThis value should be in OSRS gp.\n\nYou have 24 hours to provide the value or this order will be flagged for mod review.")
+                    
+                    def check(m):
+                        return m.channel == value_chan
+
+                    invalid=1
+
+                    while invalid:
+                        msg = await client.wait_for('message', check=check)
+
+                        if str(msg.content).isnumeric():
+                            num = int(msg.content)
+                            mult = 1
+                            invalid=0
+                        else:
+                            if str(msg.content[:-1]).isnumeric():
+                                num = int(msg.content[:-1])
+                                mult = str(msg.content[-1]).lower()
+
+                                if mult in ['k', 'm', 'b']:
+                                    invalid=0
+
+                        if invalid: 
+                            await value_chan.send("That input was not valid, please try again.\nYour input should only be a number and a letter (k, m, or b) and nothing else.")
+
+                    await value_chan.send("Thank you, your input has been recorded.\nThis channel will self destruct in 24 hours.")
+
+                    if mult == 'k':
+                        mult = int(1000)
+                    elif mult == 'm':
+                        mult = int(1000000)
+                    elif mult == 'b':
+                        mult = int(1000000000)
+
+                    value = num * mult
+                    dev_fee = int(value * float(os.getenv('dev_fee')))
+
+                    mycursor = mydb.cursor()
+                    developer = message.guild.get_member(int(os.getenv('developer')))
+                    sql = "INSERT INTO commissions (date, name, id, buyer, amount) VALUES (%s, %s, %s, %s, %s)"
+                    val = (str(datetime.now()), str(developer), str(developer.id), str(buyer), str(dev_fee))
+                    mycursor.execute(sql, val)
+                    mydb.commit()
+
+                    await asyncio.sleep(1440)
+                    await value_chan.delete()
                     
 
     else:
