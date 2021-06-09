@@ -103,17 +103,25 @@ async def on_raw_reaction_add(payload):
                         mult = int(1000000000)
 
                     value = num * mult
+                    commission = int(value * 0.1)
+                    dev_fee = int(value * 0.05)
 
                     mycursor.execute(str("SELECT * FROM buyers WHERE id=" + str(buyer.id)))
                     commissioner = mycursor.fetchall()
 
                     if commissioner:
                         sql = "INSERT INTO commissions (date, name, id, buyer, amount) VALUES (%s, %s, %s, %s, %s)"
-                        val = (str(datetime.now()), str(commissioner[0][3]), str(commissioner[0][4]), str(buyer), str(value))
+                        val = (str(datetime.now()), str(commissioner[0][3]), str(commissioner[0][4]), str(buyer), str(commission))
                         mycursor.execute(sql, val)
                         mydb.commit()
+                    
+                    developer = message.guild.get_member(int(os.getenv('developer')))
+                    sql = "INSERT INTO commissions (date, name, id, buyer, amount) VALUES (%s, %s, %s, %s, %s)"
+                    val = (str(datetime.now()), str(developer), str(developer.id), str(buyer), str(dev_fee))
+                    mycursor.execute(sql, val)
+                    mydb.commit()
 
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(1440)
                     await value_chan.delete()
 
         elif channel_cat.id == int(os.getenv('ext_order_cat')):
