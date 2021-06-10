@@ -55,11 +55,8 @@ async def on_member_join(member):
         if invite.uses > int(old_invites[int(old_index+1)]):
             break
 
-    buyer = discord.utils.get(member.guild.roles, name="Buyer")
-    await member.add_roles(buyer)
-
     channel = client.get_channel(int(os.getenv('welcome_chan')))
-    await channel.send("Hey <@!" + str(member.id) + ">, welcome to " + member.guild.name + "\n\nTo place an order use <#" + os.getenv('order_chan') + ">.\nTo create a ticket use <#" + os.getenv('ticket_chan') + ">.\n\nI have detected that you were invited by <@!" + str(invite.inviter.id) + ">. If this seems incorrect, create a ticket to correct it.")
+    await channel.send("Hey <@!" + str(member.id) + ">, welcome to " + member.guild.name + "\n\nTo place an order use <#" + os.getenv('order_chan') + ">.\nTo create a ticket use <#" + os.getenv('ticket_chan') + ">.\nTo request certain roles use <#" + os.getenv('roles_chan')  + "\n\nI have detected that you were invited by <@!" + str(invite.inviter.id) + ">. If this seems incorrect, create a ticket to correct it.")
 
     mycursor = mydb.cursor()
     sql = "INSERT INTO buyers (date, name, id, inviter, inviter_id) VALUES (%s, %s, %s, %s, %s)"
